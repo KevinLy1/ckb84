@@ -8,7 +8,7 @@ ENV PYTHONUNBUFFERED=1 \
 WORKDIR /repo/03_case
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 \
+    && apt-get install -y --no-install-recommends libgl1 libglib2.0-0 fonts-liberation \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
