@@ -18,4 +18,14 @@ Raspberry Pi RP2040 MCU.
 
 ## PCB
 
+![PCB Top](./images/pcb_top.png)
+![PCB Bottom](./images/pcb_bottom.png)
+
 ## Case and Plate
+
+![Case + Plate](./images/case_plate.png)
+![Exploded view](./images/exploded_view.png)
+
+## Firmware
+
+See [QMK Reproducible](https://github.com/KevinLy1/qmk_reproducible) -> diy/ckb84.
