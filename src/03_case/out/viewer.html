@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ckb84 case viewer</title>
+<style>
+  :root { color-scheme: light dark; --bg: #f2f2f4; --fg: #1d1d1f; --panel: rgba(255,255,255,.88); --line: #c9c9ce; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #1b1b1e; --fg: #e8e8ea; --panel: rgba(34,34,38,.88); --line: #444449; } }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); font: 13px/1.4 system-ui, sans-serif; overflow: hidden; }
+  canvas { display: block; }
+  #panel { position: fixed; top: 12px; left: 12px; width: 220px; padding: 10px 12px; background: var(--panel);
+           border: 1px solid var(--line); border-radius: 8px; backdrop-filter: blur(6px); max-height: calc(100% - 48px); overflow: auto; }
+  #panel h1 { font-size: 13px; margin: 0 0 8px; }
+  #panel label { display: flex; align-items: center; gap: 6px; padding: 1px 0; cursor: pointer; }
+  #panel label.loading { opacity: .5; }
+  .sw { width: 10px; height: 10px; border-radius: 2px; border: 1px solid var(--line); flex: none; }
+  .row { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--line); }
+  .row input[type=range] { width: 100%; }
+  .btns { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+  button { font: inherit; color: inherit; background: transparent; border: 1px solid var(--line); border-radius: 5px; padding: 2px 8px; cursor: pointer; }
+  #status { position: fixed; bottom: 10px; left: 12px; font-size: 12px; opacity: .7; }
+  @media (max-width: 600px) { #panel { width: 170px; } }
+</style>
+<script type="importmap">
+{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+               "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/" } }
+</script>
+</head>
+<body>
+<div id="panel">
+  <h1>ckb84 case</h1>
+  <div id="layers"></div>
+  <div class="row">
+    <label>Explode <span id="exv">0</span> mm</label>
+    <input id="explode" type="range" min="0" max="60" step="1" value="0">
+    <div class="btns">
+      <button data-view="iso">Iso</button><button data-view="top">Top</button>
+      <button data-view="front">Front</button><button data-view="side">Side</button>
+    </div>
+    <div class="btns"><button id="section">Section: off</button></div>
+  </div>
+</div>
+<div id="status">Loading...</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { STLLoader } from 'three/addons/loaders/STLLoader.js';
+
+THREE.Object3D.DEFAULT_UP.set(0, 0, 1);   // meshes are in the desk frame: z up, y towards the USB port
+
+// name, label, color, explode step (units of the slider, along the keyboard normal), initially visible, opacity
+const PARTS = [
+  ['bottom_case',    'Bottom case',    0xa3171c, 0,    true],
+  ['bumpons',        'Rubber feet',    0x151517, -1,   true],
+  ['case_foam',      'Case foam',      0xd9d4c7, 1,    true],
+  ['magnets_bottom', 'Magnets (bottom)', 0xc7c9d1, 2,  true],
+  ['cable',          'USB-C cable',    0x202024, -0.5, true],
+  ['pcb',            'PCB',            0x1a6626, 3,    true],
+  ['components',     'Components',     0x6b6e75, 3.5,  true],
+  ['pcb_foam',       'PCB foam',       0xd9d4c7, 4,    true],
+  ['gaskets',        'Gaskets',        0x2e3850, 5,    true],
+  ['plate',          'Plate',          0xd9b34d, 6,    true],
+  ['stabs',          'Stabilizers',    0x1a1a1c, 6.5,  true],
+  ['keycaps',        'Keycaps',        0xe6e3da, 9,    true],
+  ['magnets_top',    'Magnets (top)',  0xc7c9d1, 7,    true],
+  ['top_case',       'Top case',       0xc41f24, 8,    true],
+];
+const TILT = THREE.MathUtils.degToRad(8);
+const NORMAL = new THREE.Vector3(0, -Math.sin(TILT), Math.cos(TILT));
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(devicePixelRatio);
+renderer.setSize(innerWidth, innerHeight);
+renderer.localClippingEnabled = true;
+document.body.prepend(renderer.domElement);
+
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 1, 5000);
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+
+scene.add(new THREE.HemisphereLight(0xffffff, 0x555560, 1.1));
+const sun = new THREE.DirectionalLight(0xffffff, 1.6);
+sun.position.set(-300, -400, 600);
+camera.add(sun);          // light follows the camera
+scene.add(camera);
+
+const clip = new THREE.Plane(new THREE.Vector3(1, 0, 0), 0);
+let sectionOn = false;
+
+const groups = {};
+const status = document.getElementById('status');
+const layersEl = document.getElementById('layers');
+let center = new THREE.Vector3(), radius = 300, pending = PARTS.length;
+
+for (const [name, label, color, step, visible] of PARTS) {
+  const lab = document.createElement('label');
+  lab.className = 'loading';
+  lab.innerHTML = `<input type="checkbox" ${visible ? 'checked' : ''} disabled><span class="sw" style="background:#${color.toString(16).padStart(6, '0')}"></span>${label}`;
+  layersEl.appendChild(lab);
+  const box = lab.querySelector('input');
+  const g = new THREE.Group();
+  g.visible = visible;
+  scene.add(g);
+  groups[name] = { g, step };
+  box.addEventListener('change', () => { g.visible = box.checked; });
+
+  new STLLoader().load(`web/${name}.stl`, geo => {
+    geo.computeVertexNormals();
+    const mat = new THREE.MeshStandardMaterial({
+      color, roughness: name.includes('magnets') ? 0.3 : 0.6, metalness: name.includes('magnets') ? 0.8 : 0.05,
+      side: THREE.DoubleSide, clippingPlanes: [clip],
+      transparent: name === 'case_foam' || name === 'pcb_foam', opacity: 1,
+    });
+    g.add(new THREE.Mesh(geo, mat));
+    if (name === 'bottom_case') {
+      geo.computeBoundingBox();
+      const b = geo.boundingBox;
+      b.getCenter(center);
+      radius = b.getSize(new THREE.Vector3()).length();
+      setView('iso');
+    }
+    lab.className = '';
+    box.disabled = false;
+    if (--pending === 0) status.textContent = 'Drag: rotate, right drag: pan, wheel: zoom';
+    else status.textContent = `Loading... ${PARTS.length - pending}/${PARTS.length}`;
+  }, undefined, () => {
+    lab.textContent = `${label} (missing)`;
+    if (--pending === 0) status.textContent = 'Some meshes are missing in out/web/ - run build_all.py';
+  });
+}
+
+function setView(v) {
+  const d = radius * 1.3;
+  const dir = { iso: [-0.5, -1, 0.9], top: [0, -0.001, 1], front: [0, -1, 0.05], side: [1, 0, 0.05] }[v];
+  camera.position.copy(center).add(new THREE.Vector3(...dir).normalize().multiplyScalar(d));
+  controls.target.copy(center);
+  controls.update();
+}
+document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+
+const ex = document.getElementById('explode');
+ex.addEventListener('input', () => {
+  document.getElementById('exv').textContent = ex.value;
+  for (const { g, step } of Object.values(groups)) g.position.copy(NORMAL).multiplyScalar(step * Number(ex.value));
+});
+
+const secBtn = document.getElementById('section');
+secBtn.addEventListener('click', () => {
+  sectionOn = !sectionOn;
+  clip.constant = sectionOn ? center.x : 1e6;    // keep x <= center.x
+  secBtn.textContent = `Section: ${sectionOn ? 'on' : 'off'}`;
+});
+clip.constant = 1e6; clip.normal.set(-1, 0, 0);
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+renderer.setAnimationLoop(() => { controls.update(); renderer.render(scene, camera); });
+</script>
+</body>
+</html>

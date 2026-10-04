@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Clavier 75 % sur mesure : boîtier gasket-mount</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --bg:#fbfaf8; --fg:#1f2328; --muted:#5d6670; --line:#e3e0da; --card:#ffffff;
+        --accent:#b3141b; --accent-soft:#fbeaea; --code:#f3f1ed; --warn:#fff6e0; --warn-line:#e7b84a; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --bg:#16181c; --fg:#e6e6e6; --muted:#9aa3ad; --line:#2c3036; --card:#1d2025;
+        --accent:#ff6b70; --accent-soft:#3a1d20; --code:#23262c; --warn:#2e2714; --warn-line:#a8842f; } }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin:0; background:var(--bg); color:var(--fg);
+       font:16px/1.65 "Inter", system-ui, -apple-system, "Segoe UI", sans-serif; }
+.layout { display:grid; grid-template-columns: 250px minmax(0, 1fr); max-width:1200px; margin:0 auto; gap:40px; padding:0 24px; }
+nav { position:sticky; top:0; align-self:start; max-height:100vh; overflow:auto; padding:32px 0; font-size:14px; }
+nav .lang { display:inline-block; margin-bottom:24px; padding:6px 12px; border:1px solid var(--line);
+            border-radius:999px; color:var(--fg); text-decoration:none; background:var(--card); }
+nav .lang:hover { border-color:var(--accent); color:var(--accent); }
+nav h2 { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin:0 0 8px; }
+nav ul { list-style:none; margin:0; padding:0; }
+nav li a { display:block; padding:5px 10px; border-left:2px solid var(--line); color:var(--muted); text-decoration:none; }
+nav li a:hover { color:var(--fg); border-left-color:var(--accent); }
+main { padding:32px 0 96px; min-width:0; }
+h1 { font-size:2.1rem; line-height:1.2; margin:0 0 16px; }
+h2 { font-size:1.45rem; margin:56px 0 16px; padding-top:8px; border-top:1px solid var(--line); }
+h3 { font-size:1.1rem; margin:32px 0 10px; }
+p, li { max-width:75ch; }
+a { color:var(--accent); }
+strong { font-weight:650; }
+code { font:0.88em/1.4 ui-monospace, "Cascadia Code", Consolas, monospace; background:var(--code);
+       padding:2px 6px; border-radius:5px; }
+pre { background:var(--code); padding:14px 16px; border-radius:8px; overflow:auto; }
+pre code { padding:0; background:none; }
+.table-wrap { overflow-x:auto; margin:16px 0; border:1px solid var(--line); border-radius:10px; background:var(--card); }
+table { border-collapse:collapse; width:100%; font-size:15px; }
+th, td { text-align:left; vertical-align:top; padding:9px 12px; border-bottom:1px solid var(--line); }
+tr:last-child td { border-bottom:none; }
+th { font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted); background:var(--code); }
+thead tr th:empty { display:none; }
+main > p:first-of-type { font-size:1.08rem; }
+.callout { background:var(--warn); border-left:4px solid var(--warn-line); border-radius:8px; padding:4px 20px 8px; margin:24px 0; }
+.callout h3 { margin-top:16px; }
+ol { padding-left:0; counter-reset:step; list-style:none; }
+ol > li { counter-increment:step; position:relative; padding:12px 16px 12px 56px; margin:10px 0;
+          background:var(--card); border:1px solid var(--line); border-radius:10px; max-width:none; }
+ol > li::before { content:counter(step); position:absolute; left:14px; top:11px; width:28px; height:28px;
+                  border-radius:50%; background:var(--accent-soft); color:var(--accent); font-weight:700;
+                  display:grid; place-items:center; font-size:14px; }
+ol ol > li { background:transparent; border:none; padding:4px 0 4px 36px; margin:2px 0; }
+ol ol > li::before { width:22px; height:22px; top:5px; left:0; font-size:12px; }
+.drawings { display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px; }
+figure { margin:0; background:#fff; border:1px solid var(--line); border-radius:10px; padding:12px; }
+figure img { width:100%; height:auto; display:block; }
+figcaption { margin-top:8px; font-size:14px; color:#444; display:flex; justify-content:space-between; }
+figcaption a { color:#b3141b; }
+@media (max-width: 860px) {
+  .layout { grid-template-columns:1fr; gap:0; padding:0 16px; }
+  nav { position:static; max-height:none; padding:20px 0 0; }
+  nav ul { display:none; }
+  h1 { font-size:1.7rem; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav>
+  <a class="lang" href="README.en.html">🌐 English</a>
+  <h2>Sommaire</h2>
+  <ul><li><a href="#construction">Construction</a></li><li><a href="#resume-de-la-conception">Résumé de la conception</a></li><li><a href="#fabrication">Fabrication</a></li><li><a href="#liste-dachats-amazonfr">Liste d'achats (amazon.fr)</a></li><li><a href="#drawings">Dessins</a></li></ul>
+</nav>
+<main>
+<h1 id="clavier-75-sur-mesure-boitier-gasket-mount">Clavier 75 % sur mesure : boîtier gasket-mount</h1>
+<p>Boîtier usiné CNC, avec une plaque montée sur joints en Poron et des aimants à la place des vis. Tout est généré à partir du PCB KiCad de <code>src/02_pcb</code>, par les scripts build123d de <code>src/</code>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Caractéristique</th>
+<th>Valeur</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dimensions</td>
+<td><strong>319,8 × 143,8 mm</strong>, 148 mm de profondeur posé sur le bureau</td>
+</tr>
+<tr>
+<td>Hauteur (avant / arrière)</td>
+<td><strong>22,1 / 42,1 mm</strong></td>
+</tr>
+<tr>
+<td>Angle de frappe</td>
+<td><strong>8°</strong>, donné par le bottom case en coin</td>
+</tr>
+<tr>
+<td>Masse</td>
+<td>top case ≈ 87 g + bottom case ≈ 655 g</td>
+</tr>
+<tr>
+<td>Montage</td>
+<td>10 pattes de plaque entre des pastilles de Poron</td>
+</tr>
+<tr>
+<td>Fermeture</td>
+<td>8 paires d'aimants 5 × 2 mm</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="construction">Construction</h2>
+<p>Depuis <code>src/03_case</code>, avec Docker Desktop lancé (environnement figé, build123d 0.13.0) :</p>
+<pre><code class="language-bash">docker compose build
+</code></pre>
+<pre><code class="language-bash">docker compose run --rm cad src/build_all.py
+</code></pre>
+<pre><code class="language-bash">docker compose run --rm cad src/drawings.py
+</code></pre>
+<pre><code class="language-bash">docker compose run --rm cad src/docs_html.py
+</code></pre>
+<p>Pour servir le viewer, puis ouvrir <code>http://localhost:8765/out/viewer.html</code> :</p>
+<pre><code class="language-bash">docker compose run --rm --service-ports cad -m http.server 8765
+</code></pre>
+<p><code>build_all.py</code> vérifie aussi qu'aucune pièce n'en chevauche une autre (tous les résultats doivent valoir <code>0.0</code>). Ré-exporter <code>in/pcb.step</code> et <code>in/pcb_full.step</code> après une modification du PCB demande <code>kicad-cli</code> sur la machine.</p>
+<h2 id="resume-de-la-conception">Résumé de la conception</h2>
+<p>Empilement (dessus du PCB = 0, en mm) : PCB −1,51 … 0, plaque 3,5 … 5,0, joints 3,0 (compressés à 2,4), plan de jonction 5,0, dessus 14,0, fond de cavité −6,51.</p>
+<ul>
+<li><strong>Plaque :</strong> 1,5 mm, découpes de switches 14 × 14 mm, découpes de stabilisateurs Cherry à visser, 10 pattes de joint avec fentes de flexion. Les positions viennent des empreintes KiCad.</li>
+<li><strong>Top case :</strong> cadre de 9 mm avec un pont de 4,5 mm sur la rangée F.</li>
+<li><strong>Bottom case :</strong> cavité parallèle à la plaque, rebord de centrage, ouverture USB-C avec une peau de 1 mm pour ne laisser voir que le port, encoche de levage à l'arrière, dessous à 8° avec quatre logements de Ø10,4 pour les patins.</li>
+<li><strong>Stabilisateurs :</strong> S5 est dans l'orientation Cherry standard, S1–S4 sont tournés de 180° sur le PCB. La plaque suit le PCB, elle s'adapte donc telle quelle.</li>
+</ul>
+<h2 id="fabrication">Fabrication</h2>
+<ul>
+<li><strong>Top case :</strong> 2 mises en position. <strong>Bottom case :</strong> 3 mises en position (face de jonction, dessous à 8°, ouverture USB-C sur la face arrière).</li>
+<li><strong>Prototype d'abord :</strong> imprime les STL en 3D pour vérifier l'assemblage avant de payer l'usinage.</li>
+</ul>
+<h2 id="liste-dachats-amazonfr">Liste d'achats (amazon.fr)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Article</th>
+<th>Qté</th>
+<th>Caractéristiques</th>
+<th>Recherche sur amazon.fr</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Aimants néodyme</td>
+<td>16 (8 paires) + rechange</td>
+<td>Disque <strong>5 × 2 mm</strong>, N52</td>
+<td><code>aimant néodyme 5x2 mm</code> (lots de 50)</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Mousse pour joints</td>
+<td>20 pastilles</td>
+<td><strong>Poron 3 mm</strong> (ou mousse EPDM 3 mm), adhésive ; à découper en pastilles de 15 × 3 mm</td>
+<td><code>poron 3mm adhésif</code> / <code>joint mousse EPDM adhésif 3 mm</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>Patins en caoutchouc</td>
+<td>4</td>
+<td>Patins adhésifs plats <strong>Ø10 × 3 mm</strong></td>
+<td><code>patins caoutchouc adhésifs 10 x 3 mm</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td>Mousse de fond</td>
+<td>1 feuille ≥ 310 × 130 mm</td>
+<td><strong>3 mm</strong>, Poron ou EVA (moins cher) ; découpe selon <code>case_foam.dxf</code></td>
+<td><code>feuille mousse EVA 3 mm A3</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>Mousse PCB/plaque (optionnelle)</td>
+<td>1 feuille</td>
+<td>3–3,5 mm, Poron ou PE, avec les trous des switches</td>
+<td><code>mousse polyuréthane 3 mm</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Colle</td>
+<td>1</td>
+<td>Cyanoacrylate en <strong>gel</strong> ou époxy bi-composant</td>
+<td><code>colle cyanoacrylate gel</code> / <code>Araldite</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="drawings">Dessins</h2>
+<div class="drawings"><figure><a href="drawings/01_plate.svg"><img src="drawings/01_plate.svg" alt="Plaque" loading="lazy"></a><figcaption><span>Plaque</span><a href="drawings/01_plate.svg">Ouvrir en grand ↗</a></figcaption></figure><figure><a href="drawings/02_top_case.svg"><img src="drawings/02_top_case.svg" alt="Top case" loading="lazy"></a><figcaption><span>Top case</span><a href="drawings/02_top_case.svg">Ouvrir en grand ↗</a></figcaption></figure><figure><a href="drawings/03_bottom_case.svg"><img src="drawings/03_bottom_case.svg" alt="Bottom case" loading="lazy"></a><figcaption><span>Bottom case</span><a href="drawings/03_bottom_case.svg">Ouvrir en grand ↗</a></figcaption></figure><figure><a href="drawings/04_section.svg"><img src="drawings/04_section.svg" alt="Coupe A-A" loading="lazy"></a><figcaption><span>Coupe A-A</span><a href="drawings/04_section.svg">Ouvrir en grand ↗</a></figcaption></figure></div>
+</main>
+</div>
+</body>
+</html>

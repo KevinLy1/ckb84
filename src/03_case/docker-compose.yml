@@ -1,0 +1,9 @@
+services:
+  cad:
+    build: .
+    image: build123-ckb84
+    volumes:
+      - ..:/repo
+    working_dir: /repo/03_case
+    ports:
+      - "8765:8765"

@@ -1,0 +1,152 @@
+(kicad_sch
+	(version 20260306)
+	(generator "eeschema")
+	(generator_version "10.0")
+	(uuid "89a8ab5c-263d-471f-a620-a01151b0b9d8")
+	(paper "A2")
+	(lib_symbols)
+	(sheet
+		(at 42.418 45.212)
+		(size 183.388 117.602)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "12aab552-8370-44d9-b221-52e88ee30c96")
+		(property "Sheetname" "KEYBOARD MATRIX"
+			(at 42.418 44.5004 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "keyboard_matrix.kicad_sch"
+			(at 42.418 163.3986 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "ckb84"
+				(path "/89a8ab5c-263d-471f-a620-a01151b0b9d8"
+					(page "2")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 293.624 45.72)
+		(size 187.198 117.094)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "1f2634df-a489-4921-ace5-7621efb17f2c")
+		(property "Sheetname" "RGB LEDs"
+			(at 293.624 45.0084 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "rgb_leds.kicad_sch"
+			(at 293.624 163.3986 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "ckb84"
+				(path "/89a8ab5c-263d-471f-a620-a01151b0b9d8"
+					(page "3")
+				)
+			)
+		)
+	)
+	(sheet
+		(at 131.064 194.564)
+		(size 198.12 131.318)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(stroke
+			(width 0.1524)
+			(type solid)
+		)
+		(fill
+			(color 0 0 0 0)
+		)
+		(uuid "76f0933b-3fa2-4151-b4e7-60dd28e9e36a")
+		(property "Sheetname" "RP2040 MCU"
+			(at 131.064 193.8524 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left bottom)
+			)
+		)
+		(property "Sheetfile" "rp2040_mcu.kicad_sch"
+			(at 131.064 326.4666 0)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify left top)
+			)
+		)
+		(instances
+			(project "ckb84"
+				(path "/89a8ab5c-263d-471f-a620-a01151b0b9d8"
+					(page "4")
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

@@ -1,0 +1,6 @@
+.venv
+out
+docs
+in
+src
+*.tar
