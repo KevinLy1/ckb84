@@ -1,4 +1,4 @@
-"""Top and bottom case (CNC ABS), built in the keyboard frame (see params.py).
+"""Top and bottom case (CNC: ABS or aluminium), built in the keyboard frame (see params.py).
 
 Every pocket is parallel to the plate, so both parts machine on a 3-axis mill.
 The only angled face is the bottom-case underside (one flat face, cut at 8 deg).
@@ -34,7 +34,7 @@ def magnet_pockets(z_face, direction):
 
 
 def check_magnet_clearance():
-    """Every magnet must keep >= 1 mm of wall from tab pockets and the outside."""
+    """Every magnet must keep MAG_WALL_MIN of wall from tab pockets, the recess and the outside."""
     pockets = []
     for t in layout()[2]:
         c, w = (t["a"] + t["b"]) / 2, t["b"] - t["a"] + 2 * TAB_POCKET_CLEAR
@@ -43,10 +43,10 @@ def check_magnet_clearance():
         for pe, a, b in pockets:
             if pe == e:
                 gap = max(a - p, p - b) - MAG_POCKET_D / 2
-                assert gap >= 1.0, f"magnet {e}@{p} only {gap:.2f} mm from a tab pocket"
+                assert gap >= MAG_WALL_MIN - 1e-9, f"magnet {e}@{p} only {gap:.2f} mm from a tab pocket"
         outer = OUTER_SIDE if e in ("left", "right") else OUTER_OFF
-        assert outer - MAG_OFF - MAG_POCKET_D / 2 >= 1.0, f"magnet {e}@{p} too close to the outside"
-    assert MAG_OFF - MAG_POCKET_D / 2 - TOP_POCKET_OFF >= 1.0
+        assert outer - MAG_OFF - MAG_POCKET_D / 2 >= MAG_WALL_MIN - 1e-9, f"magnet {e}@{p} too close to the outside"
+    assert MAG_OFF - MAG_POCKET_D / 2 - TOP_POCKET_OFF >= MAG_WALL_MIN - 1e-9
     # side walls: at least 2 mm outside the tab pockets
     assert OUTER_SIDE - (TAB_P + TAB_POCKET_CLEAR) >= 2.0
 

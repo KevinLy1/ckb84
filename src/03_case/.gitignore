@@ -1,4 +1,5 @@
 /out/*.step
 /out/*.dxf
+/out/*.pdf
 /out/*.stl
 /out/web/

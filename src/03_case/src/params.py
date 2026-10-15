@@ -67,7 +67,9 @@ TOP_Z = PLATE_Z1 + 9.0              # 14.0 top surface (high-profile, hides swit
 OPENING_OFF = 0.3                   # key opening beyond the key area (caps sit >= 0.4 inside it)
 OPENING_R = 1.0                     # 2 mm end mill
 TAB_POCKET_CLEAR = 1.0
-LIP_OFF0, LIP_OFF1, LIP_H = CAV_GAP, 2.6, 1.5    # alignment lip on the bottom case
+# Alignment lip on the bottom case. 0.25 mm/side to the recess: still >= 0.1 at +/-0.1 tolerance
+# plus an anodized coating on both parts, so one design serves ABS, raw and anodized aluminium
+LIP_OFF0, LIP_OFF1, LIP_H = CAV_GAP, 2.55, 1.5
 TOP_POCKET_OFF = 2.8                # top-case underside recess (fits over the lip)
 FLOOR_Z = -PCB_T - 5.0              # -6.51 cavity floor (parts + case foam)
 MIN_FLOOR = 3.0                     # thinnest floor, at the front
@@ -98,8 +100,11 @@ USB_PORT_CLEAR = 0.5                # around the receptacle shell
 
 # ---- Magnets (5 x 2 mm N52 discs) --------------------------------------------
 MAG_D, MAG_H = 5.0, 2.0
-MAG_POCKET_D, MAG_POCKET_H = 5.1, 2.1
-MAG_OFF = 6.4                       # from PCB edge: 1 mm wall to the recess and to the outside
+# Pocket wider than the disc diagonal (sqrt(5^2 + 2^2) = 5.39): a magnet seated crooked cannot
+# wedge, and a pick fits beside it to lift it out before the glue sets
+MAG_POCKET_D, MAG_POCKET_H = 5.6, 2.1
+MAG_WALL_MIN = 0.8                  # pocket -> recess / outside / tab pockets
+MAG_OFF = 6.4                       # from PCB edge: centred between the recess and the outside
 # 8 pairs, symmetric about the board centre line, one near each corner
 MAGNETS = [("back", 10), ("back", 80), ("back", 225), ("back", 295),
            ("front", 10), ("front", 65.7), ("front", 239.1), ("front", 295)]

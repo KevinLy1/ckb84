@@ -1,20 +1,32 @@
-"""Dimensioned technical drawings (SVG): plate, top case, bottom case and its section."""
+"""Dimensioned technical drawings: plate, top case, bottom case and its section.
+SVG for the docs, PDF copies in ../out/ for the machine shop."""
 import math
 from pathlib import Path
 
+import cairosvg
 from build123d import *
 
 from params import *
 import case
+from geom import edge_point
 import plate as plate_mod
 
 ROOT = Path(__file__).resolve().parent.parent
 DOCS = ROOT / "docs" / "drawings"
 DOCS.mkdir(parents=True, exist_ok=True)
+OUT = ROOT / "out"
+OUT.mkdir(exist_ok=True)
 
 draft = Draft(font_size=3.0, decimal_precision=1, display_units=False, arrow_length=2.5,
               line_width=0.15, pad_around_text=1.0)
 INK, DIM, THIN, CUT = (0.1, 0.1, 0.1), (0.05, 0.3, 0.7), (0.55, 0.55, 0.55), (0.75, 0.2, 0.2)
+
+# Fit features: +/-0.1 still leaves >= 0.1 mm/side between lip and recess, and a magnet pocket
+# wider than the disc diagonal. Everything else is ISO 2768-m.
+TOL_FIT = "\u00b10.1"
+TOL_NOTE = ("General tolerances ISO 2768-m unless stated.  Not to scale: geometry per STEP, "
+            "dimensions in mm.  If anodized, dimensions apply before coating (fits allow 25 um).")
+MATERIAL = "ABS or Al 6061 (raw or anodized)"
 
 
 def sheet(name, layers, title, scale=2.4):
@@ -27,6 +39,7 @@ def sheet(name, layers, title, scale=2.4):
     bb = Compound([s for _, _, ss, _ in layers for s in ss]).bounding_box()
     exp.add_shape(Pos(bb.min.X, bb.min.Y - 14) * Text(title, 5, align=(Align.MIN, Align.MIN)), layer="title")
     exp.write(DOCS / f"{name}.svg")
+    cairosvg.svg2pdf(url=str(DOCS / f"{name}.svg"), write_to=str(OUT / f"{name}.pdf"))
     print("wrote", name)
 
 
@@ -51,6 +64,24 @@ def hdim(x0, x1, y, off, label=None):
 
 def vdim(y0, y1, x, off, label=None):
     return _dim((x, y0), (x, y1), off, label)
+
+
+def magnet_callout(pos=80.0):
+    """Leader to one back-edge magnet pocket (all 8 are identical). A diameter dimension does not
+    fit: the pocket is narrower than its label."""
+    x, y = edge_point("back", pos, MAG_OFF)
+    c = MAG_POCKET_D / 2 * math.sqrt(0.5)
+    tip = (x + c, y + c)
+    elbow = (tip[0] + OUTER_OFF - MAG_OFF, tip[1] + OUTER_OFF - MAG_OFF)
+    return [Arrow(draft.arrow_length, Edge.make_line(tip, elbow), draft.line_width),
+            Pos(elbow[0] + 1, elbow[1]) * Text(f"{len(MAGNETS)}x \u00d8{MAG_POCKET_D} {TOL_FIT} x {MAG_POCKET_H} deep",
+                                               draft.font_size, align=(Align.MIN, Align.CENTER))]
+
+
+def fit_dims(off, tol):
+    """Width and depth of the PCB outline grown by `off` (lip or recess), drawn inside the key area."""
+    x0, x1, y0, y1 = PCB_X0 - off, PCB_X1 + off, PCB_Y0 - off, PCB_Y1 + off
+    return [hdim(x0, x1, y1, 12, f"{x1 - x0:.2f} {tol}"), vdim(y0, y1, x0, -18, f"{y1 - y0:.2f} {tol}")]
 
 
 def note(x, y, text, size=3.0):
@@ -86,8 +117,10 @@ def top_case_sheet():
             vdim(key_y0 - OPENING_OFF, OPENING_OFF, PCB_X1 + OPENING_OFF, -8),
             vdim(OPENING_OFF, PCB_Y1 + o, 40, 0),
             hdim(-s, -OPENING_OFF, -60, 0),
-            vdim(BRIDGE_Y0, BRIDGE_Y1, 160, 0)]
-    notes = [note(-s, PCB_Y1 + o + 26, f"TOP CASE  -  ABS  -  thickness {TOP_Z - SPLIT_Z:.1f}  -  outer corners R{OUTER_R:.0f}, top edge fillet R{TOP_EDGE_FILLET}"),
+            vdim(BRIDGE_Y0, BRIDGE_Y1, 160, 0)] + magnet_callout() + fit_dims(TOP_POCKET_OFF, TOL_FIT)
+    notes = [note(-s, PCB_Y1 + o + 38, TOL_NOTE),
+             note(-s, PCB_Y1 + o + 32, f"Underside recess (fits over the bottom-case lip): {TOL_FIT}, corners R{CAV_R + TOP_POCKET_OFF - CAV_GAP:.1f}"),
+             note(-s, PCB_Y1 + o + 26, f"TOP CASE  -  {MATERIAL}  -  thickness {TOP_Z - SPLIT_Z:.1f}  -  outer corners R{OUTER_R:.0f}, top edge fillet R{TOP_EDGE_FILLET}"),
              note(-s, PCB_Y1 + o + 20, f"Underside recess {TOP_LEDGE_Z - SPLIT_Z:.1f} deep (presses top gaskets)   opening corners R{OPENING_R} (2 mm end mill)"),
              note(-s, PCB_Y1 + o + 14, f"F-row bridge {BRIDGE_Y1 - BRIDGE_Y0:.2f} wide hides the 0.25U gap   {len(MAGNETS)}x magnet pocket D{MAG_POCKET_D} x {MAG_POCKET_H} (underside)"),
              note(165, (BRIDGE_Y0 + BRIDGE_Y1) / 2, "bridge")]
@@ -104,10 +137,12 @@ def bottom_case_sheet():
     dims = [hdim(-s, PCB_X1 + s, PCB_Y0 - o, -14), vdim(PCB_Y0 - o, PCB_Y1 + o, PCB_X1 + s, -14),
             hdim(-CAV_GAP, PCB_X1 + CAV_GAP, PCB_Y0 - CAV_GAP, 6),
             vdim(PCB_Y0 - CAV_GAP, PCB_Y1 + CAV_GAP, PCB_X1 + CAV_GAP, -6),
-            hdim(USB_X - USB_SLOT_W / 2, USB_X + USB_SLOT_W / 2, PCB_Y1 + o, 6)]
-    notes = [note(-s, PCB_Y1 + o + 38, "BOTTOM CASE  -  ABS  -  setup 1: top (cavity, lip, pockets)  -  setup 2: underside at 8 deg  -  setup 3: back face (USB slot)"),
+            hdim(USB_X - USB_SLOT_W / 2, USB_X + USB_SLOT_W / 2, PCB_Y1 + o, 6)] + magnet_callout() + fit_dims(LIP_OFF1, TOL_FIT)
+    notes = [note(-s, PCB_Y1 + o + 56, TOL_NOTE),
+             note(-s, PCB_Y1 + o + 50, f"Alignment lip outer contour (fits into the top-case recess): {TOL_FIT}, corners R{CAV_R + LIP_OFF1 - CAV_GAP:.2f}"),
+             note(-s, PCB_Y1 + o + 38, f"BOTTOM CASE  -  {MATERIAL}  -  setup 1: top (cavity, lip, pockets)  -  setup 2: underside at 8 deg  -  setup 3: back face (USB slot)"),
              note(-s, PCB_Y1 + o + 44, f"USB-C slot: stadium {USB_SLOT_W} x {USB_SLOT_H} through back wall, centre {SPLIT_Z - USB_Z:.2f} below parting face, x = {USB_X:.2f} from key-area left edge"),
-             note(-s, PCB_Y1 + o + 26, f"Cavity floor {SPLIT_Z - FLOOR_Z:.2f} below parting face; alignment lip {LIP_H} high x {LIP_OFF1 - LIP_OFF0} wide"),
+             note(-s, PCB_Y1 + o + 26, f"Cavity floor {SPLIT_Z - FLOOR_Z:.2f} below parting face; alignment lip {LIP_H} high x {LIP_OFF1 - LIP_OFF0:.2f} wide"),
              note(-s, PCB_Y1 + o + 20, f"Tab ledges {SPLIT_Z - BOT_LEDGE_Z:.1f} below parting face   {len(MAGNETS)}x magnet pocket D{MAG_POCKET_D} x {MAG_POCKET_H}"),
              note(-s, PCB_Y1 + o + 14, f"Underside: 4x foot recess D{FOOT_D} x {FOOT_DEPTH}"),
              note(USB_X - 6, PCB_Y1 + o + 3, "USB-C")]
